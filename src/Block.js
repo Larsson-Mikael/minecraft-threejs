@@ -6,8 +6,8 @@ const BlockType = {
     GRASS: 1,
     WATER: 2,
     STONE: 3,
+    SAND: 4,
 }
-
 
 const Blocks = [
     {
@@ -62,7 +62,21 @@ const Blocks = [
             x: 31,
             y: 40,
         }
-
+    },
+    {
+        name: "sand",
+        top: {
+            x: 8,
+            y: 41,
+        },
+        sides: {
+            x: 8,
+            y: 41,
+        },
+        bottom: {
+            x: 8,
+            y: 41,
+        }
     }
 
 

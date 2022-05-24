@@ -17,6 +17,12 @@ class Chunk
     }
 
 
+    setBlock(x, y, z, type)
+    {
+        let i = this.to1D(x, y, z);
+        this.data[i] = type;
+    }
+
     // in chunk coordinates
     getBlock(x, y, z)
     {

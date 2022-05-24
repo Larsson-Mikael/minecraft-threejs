@@ -27,6 +27,7 @@ class World
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.noise = new ImprovedNoise();
+        this.noise2 = new SimplexNoise();
         this.chunks = this.generateChunks();
     }
 
@@ -37,18 +38,19 @@ class World
         {
             for(let x=0; x < config.world.length; x++)
             {
-                let data = this.generateChunkData(x, z);
+                let chunk = this.generateChunk(x, z);
                 let id = `${x}.${z}`
-                chunks[id] = new Chunk(data);
+                chunks[id] = chunk;
             }
         }
 
         return chunks;
     }
 
-    generateChunkData(chunkX, chunkZ)
+    generateChunk(chunkX, chunkZ)
     {
         let result = [];
+        let chunk = new Chunk([]);
         const {length, width, height} = config.chunk;
         const {gap, seed, amp} = config.noise;
 
@@ -70,12 +72,12 @@ class World
                     val += this.noise.noise(
                         newX, 
                         newZ, 
-                        seed) * 8;
+                        123) * 8;
 
                     let stoneOffset = this.noise.noise(
                         newX,
                         newZ,
-                        seed) * 8;
+                        147) * 8;
 
                     let type = BlockType.GRASS;
 
@@ -84,35 +86,64 @@ class World
                         type = BlockType.AIR;
                     }
 
-
-                    if(y < stoneOffset + 60)
+                    if(y < val + 65)
                     {
-                        type = BlockType.STONE
+                        type = BlockType.STONE;
                     }
 
-
-                    if(type === BlockType.AIR && y < 65)
+                    if(type === BlockType.AIR && y < 65 && y > 50)
                     {
                         type = BlockType.WATER;
+
+                        if(z !== 0)
+                        {
+                            let back = chunk.getBlock(x, y, z + -1);
+
+                            if(back === BlockType.GRASS)
+                            {
+                                chunk.setBlock(x, y, z + -1, BlockType.SAND);
+                            }
+
+                        }
                     }
 
-                    result.push(type);
+                    if(y < val + 67)
+                    {
+                        let caveScale = 0.9;
+                        let caveAmp = 1;
+                        let caveNoise = this.noise2.noise3d(newX * caveScale, y * 0.1, newZ * caveScale) * caveAmp;
+
+                        if(caveNoise >= .5)
+                        {
+                            type = BlockType.AIR
+                        }
+                        else if (type !== BlockType.GRASS)
+                        {
+                            type = BlockType.STONE
+
+                        }
+                    }
+
+
+                    chunk.data.push(type);
                 }
             }
         }
 
 
-        return result;
+        return chunk;
     }
-
-    // getChunkData(chunkX, chunkZ)
-    // {
-    //     return this.chunks[`${chunkX}${chunkZ}`]
-    // }
 
     getChunkData(chunkX, chunkZ)
     {
         return this.chunks[`${chunkX}.${chunkZ}`];
+    }
+
+    to1D(x, y, z, data)
+    {
+        let xMax = config.chunk.length;
+        let zMax = config.chunk.width;
+        return (y * xMax * zMax) + (z * xMax) + x;
     }
 
     // get block in world coordinates
