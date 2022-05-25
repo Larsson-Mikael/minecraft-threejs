@@ -8,24 +8,24 @@ import {
 import SceneSubject from './SceneSubject';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {FirstPersonControls} from 'three/examples/jsm/controls/FirstPersonControls';
+import {FlyControls} from 'three/examples/jsm/controls/FlyControls';
 
 class SceneManager
 {
     constructor(canvas)
     {
+        this.canvas = canvas;
         this.screen = {
-            width: canvas.clientWidth,
-            height: canvas.clientHeight,
+            width: this.canvas.clientWidth,
+            height: this.canvas.clientHeight,
         }
 
-
-        this.clock = new Clock();
+        this.cursorLocked = true;
         this.camera = this.buildCamera();
         this.scene = this.buildScene();
         this.renderer = this.buildRenderer(canvas);
         this.sceneSubjects = [];
-
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls = new OrbitControls(this.camera, this.canvas);
     }
 
     buildCamera()
@@ -59,9 +59,8 @@ class SceneManager
         return this.screen.width / this.screen.height;
     }
 
-    update()
+    update(delta)
     {
-        const elapsedTime = this.clock.getElapsedTime();
 
         if(this.shouldResize())
         {
@@ -74,7 +73,7 @@ class SceneManager
             this.sceneSubjects[i].update(elapsedTime);
         }
 
-        this.controls.update();
+        this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
     }
 
