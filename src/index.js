@@ -1,33 +1,27 @@
 import * as THREE from '../node_modules/three';
+
 import World from './World';
 import SceneManager from './SceneManager';
+import FpsCounter from './FpsCounter';
+
 
 const canvas = document.querySelector("#c");
 let sceneManager = new SceneManager(canvas);
-let clock = new THREE.Clock();
+let chunk = new World(1024, 1024);
+chunk.display(sceneManager.scene);
+
+const counter = new FpsCounter(
+    document.querySelector("#fps")
+)
+
+console.log(counter);
 
 addLights();
 
-let chunk = new World(1024, 1024);
-chunk.display(sceneManager.scene);
-let frames = 0;
-let temp_frames = 0;
-let time = 0;
-
 function render()
 {
-    time += clock.getDelta();
-
-    if( time >= 1)
-    {
-        time = 0;
-        updateFps(frames);
-        frames = 0;
-    }
-
-    frames += 1;
-
     sceneManager.update();
+    counter.update();
     requestAnimationFrame(render);
 }
 
@@ -45,12 +39,6 @@ function addLights()
     sceneManager.scene.add(dLight);
     sceneManager.scene.add(dLight2);
 }
-
-function updateFps(frames)
-{
-    document.querySelector("#fps").innerHTML = frames;
-}
-
 
 render();
 
