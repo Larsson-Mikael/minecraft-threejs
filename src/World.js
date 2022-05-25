@@ -297,6 +297,7 @@ class World
                 const mesh = new Mesh(geometry, material);
                 mesh.position.x = x * config.chunk.length;
                 mesh.position.z = (z * config.chunk.width);
+                mesh.name = `${x}.${z}`;
 
                 scene.add(mesh);
             }
