@@ -1,10 +1,12 @@
 import {FirstPersonControls} from 'three/examples/jsm/controls/FirstPersonControls';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import {
     Object3D,
     PerspectiveCamera,
     BoxGeometry,
     Mesh,
     Vector3,
+    MathUtils
 } from 'three';
 import config from './config';
 import { MeshBasicMaterial } from 'three';
@@ -15,43 +17,62 @@ export default class Player
     constructor(x, y, z)
     {
         const { screen, renderer, canvas } = window.sceneManager;
-        canvas.requestPointerLock = canvas.requestPointerLock
+        canvas.requestPointerLock = canvas.requestPointerLock;
+        this.canvas = canvas;
         this.screen = screen;
         this.renderer = renderer
         this.speed = 5;
-        this.lookSpeed = 0.001;
+        this.runSpeed = 10;
         this.velocity = new Vector3()
-        this.velocityBuffer = [];
+
         this.moveLeft = false;
         this.moveRight = false;
         this.moveForward = false;
         this.moveBack = false;
-        this.mouseX = 0;
-        this.mouseY = 0;
+        this.running = false;
 
         this.camera = new PerspectiveCamera(90, 1, 0.1, 1000);
-        //this.controls = new FirstPersonControls(this.camera, renderer.domElement);
-
-        this.geometry = new BoxGeometry(1, 2, 1);
-        this.material = new MeshBasicMaterial({color: 0xFF0000});
-        this.mesh = new Mesh(this.geometry, this.material)
-        this.object = new Object3D();
-        this.object.add(this.camera);
-        this.object.add(this.mesh);
-        this.object.position.set(x, y, z);
+        this.controls = new PointerLockControls(this.camera, canvas);
+        this.cursorLocked = true;
+        this.object = this.setupPlayerObject(x, y, z);
 
         this.registerEventListeners();
+    }
+
+    setupPlayerObject(x, y, z)
+    {
+        var geometry = new BoxGeometry(1, 2, 1);
+        var material = new MeshBasicMaterial({color: 0xFF0000});
+        var mesh = new Mesh(geometry, material)
+
+        var object = new Object3D();
+        object.add(this.camera);
+        object.position.set(x, y, z);
+
+        return object;
     }
 
     registerEventListeners()
     {
         document.addEventListener('keydown', (e) => this.onKeyDown(e));
         document.addEventListener('keyup', (e) => this.onKeyUp(e));
-        document.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        document.addEventListener('click', () => this.controls.lock());
+        document.addEventListener('mousedown', (e) => this.onMouseDown(e));
+    }
+
+    onMouseDown(e)
+    {
+        // left click
+        if(e.buttons === 1)
+        {
+            console.log("left clicked!");
+        }
+
     }
 
     onKeyDown(e)
     {
+        console.log(e.code);
         switch(e.code)
         {
             case "KeyW": 
@@ -69,14 +90,17 @@ export default class Player
             case "KeyD": 
                 this.moveRight = true;
                 break;
+
+            case "KeyE":
+                this.object.rotateY()
+
+            case "ShiftLeft":
+                console.log("test");
+                this.running = true;
+                break;
         }
     }
 
-    onMouseMove(e)
-    {
-        this.mouseX = e.pageX - this.screen.width / 2;
-        this.mouseY = e.pageY - this.screen.height / 2;
-    }
 
     onKeyUp(e)
     {
@@ -97,25 +121,30 @@ export default class Player
             case "KeyD": 
                 this.moveRight = false;
                 break;
+
+            case "ShiftLeft":
+                this.running = false;
+                break;
         }
     }
 
     updatePosition(delta)
     {
-        let speed = this.speed * delta;
 
+        let speed = this.running ? this.runSpeed : this.speed;
+        let actualSpeed = speed * delta;
 
         if(this.moveForward)
-            this.object.translateZ(-speed);
+            this.controls.moveForward(actualSpeed);
 
         if(this.moveBack)
-            this.object.translateZ(speed);
+            this.controls.moveForward(-actualSpeed);
 
         if(this.moveLeft)
-            this.object.translateX(-speed);
+            this.controls.moveRight(-actualSpeed);
 
         if(this.moveRight)
-            this.object.translateX(speed);
+            this.controls.moveRight(actualSpeed);
 
 
         this.object.position.add(
@@ -127,24 +156,8 @@ export default class Player
         );
     }
 
-    updateRotation(delta)
-    {
-        let lookSpeed = this.lookSpeed * delta;
-
-        console.log(this.mouseX);
-        console.log(this.mouseY);
-
-        let x = this.mouseX * lookSpeed;
-        let y = this.mouseY * lookSpeed;
-
-
-        this.camera.rotateX(x);
-        this.camera.rotateY(y);
-    }
-
     update(delta)
     {
-        this.updateRotation(delta);
         this.updatePosition(delta);
     }
 
