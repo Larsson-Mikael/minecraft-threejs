@@ -25,7 +25,6 @@ class SceneManager
         this.scene = this.buildScene();
         this.renderer = this.buildRenderer(canvas);
         this.sceneSubjects = [];
-        this.controls = new OrbitControls(this.camera, this.canvas);
     }
 
     buildCamera()
@@ -73,7 +72,6 @@ class SceneManager
             this.sceneSubjects[i].update(elapsedTime);
         }
 
-        this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
     }
 
