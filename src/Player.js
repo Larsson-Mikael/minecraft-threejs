@@ -72,7 +72,6 @@ export default class Player
 
     onKeyDown(e)
     {
-        console.log(e.code);
         switch(e.code)
         {
             case "KeyW": 
@@ -145,15 +144,6 @@ export default class Player
 
         if(this.moveRight)
             this.controls.moveRight(actualSpeed);
-
-
-        this.object.position.add(
-            new Vector3(
-                this.velocity.x * this.speed * delta,
-                this.velocity.y * this.speed * delta,
-                this.velocity.z * this.speed * delta,
-            )
-        );
     }
 
     update(delta)
