@@ -15,8 +15,9 @@ const config = {
 
     // world size in chunks
     world: {
-        length: 16,
-        width: 16,
+        gravity: 0.5,
+        length: 4,
+        width: 4,
     },
 
     block: {

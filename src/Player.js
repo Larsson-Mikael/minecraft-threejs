@@ -33,8 +33,10 @@ export default class Player
 
         this.camera = new PerspectiveCamera(90, 1, 0.1, 1000);
         this.controls = new PointerLockControls(this.camera, canvas);
+        this.controls.canMoveUp = true;
         this.cursorLocked = true;
         this.object = this.setupPlayerObject(x, y, z);
+        this.position = this.controls.getObject().position;
 
         this.registerEventListeners();
     }
@@ -42,12 +44,14 @@ export default class Player
     setupPlayerObject(x, y, z)
     {
         var geometry = new BoxGeometry(1, 2, 1);
-        var material = new MeshBasicMaterial({color: 0xFF0000});
+        var material = new MeshBasicMaterial({color: 0xFF0000, wireframe: false});
         var mesh = new Mesh(geometry, material)
+        this.controls.getObject().add(mesh);
 
         var object = new Object3D();
         object.add(this.camera);
         object.position.set(x, y, z);
+        object.userData.name = "player";
 
         return object;
     }
@@ -97,6 +101,11 @@ export default class Player
                 console.log("test");
                 this.running = true;
                 break;
+
+            case "Space":
+                this.velocity.y += 0.5;
+                break;
+                
         }
     }
 
@@ -144,6 +153,10 @@ export default class Player
 
         if(this.moveRight)
             this.controls.moveRight(actualSpeed);
+
+
+        this.velocity.y -= config.world.gravity * delta;
+        this.controls.getObject().position.y += this.velocity.y; 
     }
 
     update(delta)

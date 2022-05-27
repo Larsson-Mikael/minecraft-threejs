@@ -8,7 +8,7 @@ import Player from './Player';
 const canvas = document.querySelector("#c");
 let sceneManager = new SceneManager(canvas);
 window.sceneManager = sceneManager;
-const player = new Player(0, 70, 0);
+const player = new Player(20, 80, 20);
 sceneManager.scene.add(player.object);
 sceneManager.camera = player.camera;
 let chunk = new World(1024, 1024);
@@ -19,12 +19,38 @@ const counter = new FpsCounter(
     document.querySelector("#fps")
 )
 
+console.log(sceneManager.scene);
+
 addLights();
+
+
+function checkCollision()
+{
+    var position = new THREE.Vector3();
+    player.controls.getObject().getWorldPosition(position);
+    console.log(position);
+    let data = chunk.getChunkFromWorldSpace(Math.round(position.x), Math.round(position.z));
+    console.log(data);
+
+    console.log(position);
+    let chunkPos = data.position;
+
+    var downType = data.chunk.getBlock(
+        Math.round(chunkPos.x), 
+        Math.round(position.y - 2), 
+        Math.round(chunkPos.z))
+
+    if(downType !== 0)
+    {
+        player.velocity.y = 0.1;
+    }
+}
 
 function render()
 {
     var delta = clock.getDelta();
     player.update(delta);
+    checkCollision();
     sceneManager.update(delta);
     counter.update();
     requestAnimationFrame(render);

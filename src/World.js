@@ -173,6 +173,41 @@ class World
         this.data[i] = type;
     }
 
+    getChunkFromWorldSpace(x, z)
+    {
+        let rX = x / config.chunk.length;
+        let rZ = z / config.chunk.width;
+        let chunkX = Math.trunc(rX);
+        let chunkZ = Math.trunc(rZ);
+        let dX = rX % 1;
+        let dZ = rZ % 1;
+
+        console.log(chunkX);
+        console.log(chunkZ);
+
+        return {
+           chunk: this.getChunkData(chunkX, chunkZ),
+           position: {x: dX, z: dZ},
+        }
+    }
+
+    getTileHeight(x, y, z)
+    {
+        let data = this.getChunkFromWorldSpace(x, z);
+
+        for(let blockY = y; y > 0; --y)
+        {
+            let type = data.chunk.getBlock(x, blockY, z);
+            if(type !== 0) 
+            {
+                return y;
+            }
+        }
+
+        return 0;
+    }
+
+
     generateGeometryForChunk(chunkX, chunkY, chunkZ)
     {
         const {length, width, height} = config.chunk;
@@ -208,8 +243,8 @@ class World
 
                             if(!neighbor)
                             {
-                                let ub = 12;
-                                let vb = 63;
+                                let ub = 0;
+                                let vb = 0;
 
                                 if(dirName === "top")
                                 {
