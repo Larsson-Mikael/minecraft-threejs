@@ -179,11 +179,8 @@ class World
         let rZ = z / config.chunk.width;
         let chunkX = Math.trunc(rX);
         let chunkZ = Math.trunc(rZ);
-        let dX = rX % 1;
-        let dZ = rZ % 1;
-
-        console.log(chunkX);
-        console.log(chunkZ);
+        let dX = (rX % 1) * config.chunk.length;
+        let dZ = (rZ % 1) * config.chunk.width;
 
         return {
            chunk: this.getChunkData(chunkX, chunkZ),
@@ -206,7 +203,6 @@ class World
 
         return 0;
     }
-
 
     generateGeometryForChunk(chunkX, chunkY, chunkZ)
     {

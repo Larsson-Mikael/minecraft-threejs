@@ -4,6 +4,7 @@ import World from './World';
 import SceneManager from './SceneManager';
 import FpsCounter from './FpsCounter';
 import Player from './Player';
+import config from './config';
 
 const canvas = document.querySelector("#c");
 let sceneManager = new SceneManager(canvas);
@@ -18,21 +19,13 @@ chunk.display(sceneManager.scene);
 const counter = new FpsCounter(
     document.querySelector("#fps")
 )
-
-console.log(sceneManager.scene);
-
 addLights();
-
 
 function checkCollision()
 {
     var position = new THREE.Vector3();
     player.controls.getObject().getWorldPosition(position);
-    console.log(position);
     let data = chunk.getChunkFromWorldSpace(Math.round(position.x), Math.round(position.z));
-    console.log(data);
-
-    console.log(position);
     let chunkPos = data.position;
 
     var downType = data.chunk.getBlock(
@@ -42,7 +35,7 @@ function checkCollision()
 
     if(downType !== 0)
     {
-        player.velocity.y = 0.1;
+        player.velocity.y = 0.006;
     }
 }
 
