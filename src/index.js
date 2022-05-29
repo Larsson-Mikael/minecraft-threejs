@@ -28,14 +28,22 @@ function checkCollision()
     let chunkPos = data.position;
 
     var downType = data.chunk.getBlock(
-        Math.round(Math.ceil(chunkPos.x)), 
-        Math.round(position.y - 2), 
-        Math.round(Math.ceil(chunkPos.z)))
+        Math.ceil(chunkPos.x), 
+        Math.floor(position.y - 2), 
+        Math.floor(chunkPos.z));
+
+    var insideType = data.chunk.getBlock(
+        Math.ceil(chunkPos.x), 
+        Math.floor(position.y - 1), 
+        Math.floor(chunkPos.z));
 
     if(downType !== 0)
         player.grounded= true;
     else
         player.grounded= false;
+
+    if(insideType !== 0)
+        player.object.position.y += 0.3;
 }
 
 function render()
