@@ -18,6 +18,7 @@ export default class Player
     {
         const { screen, renderer, canvas } = window.sceneManager;
         canvas.requestPointerLock = canvas.requestPointerLock;
+        this._vector = new Vector3();
         this.canvas = canvas;
         this.screen = screen;
         this.renderer = renderer
@@ -30,8 +31,12 @@ export default class Player
         this.moveForward = false;
         this.moveBack = false;
         this.running = false;
+        this.jumping = false;
+        this.grounded = false;
 
-        this.camera = new PerspectiveCamera(90, 1, 0.1, 1000);
+
+
+        this.camera = new PerspectiveCamera(90, 2, 0.1, 1000);
         this.controls = new PointerLockControls(this.camera, canvas);
         this.controls.canMoveUp = true;
         this.cursorLocked = true;
@@ -54,6 +59,11 @@ export default class Player
         object.userData.name = "player";
 
         return object;
+    }
+
+    getPosition()
+    {
+        return this.controls.getObject().position;
     }
 
     registerEventListeners()
@@ -98,12 +108,12 @@ export default class Player
                 this.object.rotateY()
 
             case "ShiftLeft":
-                console.log("test");
                 this.running = true;
                 break;
 
             case "Space":
-                this.velocity.y += 0.5;
+                this.velocity.y += 0.15;
+                this.grounded = false;
                 break;
                 
         }
@@ -136,6 +146,22 @@ export default class Player
         }
     }
 
+    forward(distance)
+    {
+        this._vector.setFromMatrixColumn( this.camera.matrix, 0 );
+
+        this._vector.crossVectors( this.camera.up, this._vector );
+
+        this.object.position.addScaledVector( this._vector, distance );
+    }
+
+    right(distance)
+    {
+        this._vector.setFromMatrixColumn( this.camera.matrix, 0 );
+
+        this.object.position.addScaledVector( this._vector, distance );
+    }
+
     updatePosition(delta)
     {
 
@@ -143,20 +169,31 @@ export default class Player
         let actualSpeed = speed * delta;
 
         if(this.moveForward)
-            this.controls.moveForward(actualSpeed);
+            this.forward(actualSpeed);
 
         if(this.moveBack)
-            this.controls.moveForward(-actualSpeed);
+            this.forward(-actualSpeed);
 
         if(this.moveLeft)
-            this.controls.moveRight(-actualSpeed);
+            this.right(-actualSpeed);
 
         if(this.moveRight)
-            this.controls.moveRight(actualSpeed);
+            this.right(actualSpeed);
 
 
-        this.velocity.y -= config.world.gravity * delta;
-        this.controls.getObject().position.y += this.velocity.y; 
+        if(!this.grounded)
+        {
+            this.velocity.y -= config.world.gravity * delta;
+            this.object.position.y += this.velocity.y; 
+        }
+        else 
+        {
+            this.velocity.y = 0;
+
+        }
+
+
+
     }
 
     update(delta)

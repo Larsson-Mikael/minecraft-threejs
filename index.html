@@ -5,7 +5,11 @@
 </head>
 <body>
   <p id="fps">0</p>
+  <div id="debug">
+    <p id="position">0, 0, 0</p>
+  </div>
   <style>
+
     html, body {
       margin: 0;
       height: 100%;
@@ -19,11 +23,20 @@
       color: red;
     }
 
+    #debug {
+      font-size: 32px;
+      position:absolute;
+      top:30px;
+      left: 5px;
+      color: red;
+    }
+
     #c {
       width: 100%;
       height: 100%;
       display: block;
     }
+
   </style>
   <canvas tabindex="0" id="c"></canvas>
   <script src="main.js"></script>

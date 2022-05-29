@@ -23,20 +23,19 @@ addLights();
 
 function checkCollision()
 {
-    var position = new THREE.Vector3();
-    player.controls.getObject().getWorldPosition(position);
+    var position = player.object.position;
     let data = chunk.getChunkFromWorldSpace(Math.round(position.x), Math.round(position.z));
     let chunkPos = data.position;
 
     var downType = data.chunk.getBlock(
-        Math.round(chunkPos.x), 
+        Math.round(Math.ceil(chunkPos.x)), 
         Math.round(position.y - 2), 
-        Math.round(chunkPos.z))
+        Math.round(Math.ceil(chunkPos.z)))
 
     if(downType !== 0)
-    {
-        player.velocity.y = 0.006;
-    }
+        player.grounded= true;
+    else
+        player.grounded= false;
 }
 
 function render()
@@ -46,6 +45,7 @@ function render()
     checkCollision();
     sceneManager.update(delta);
     counter.update();
+    updateDebugInfo();
     requestAnimationFrame(render);
 }
 
@@ -62,6 +62,14 @@ function addLights()
     dLight2.position.z = -1;
     sceneManager.scene.add(dLight);
     sceneManager.scene.add(dLight2);
+}
+
+function updateDebugInfo()
+{
+    let elem = document.querySelector("#position")
+    let pos = undefined;
+    pos = player.object.position;
+    elem.innerHTML = JSON.stringify(pos);
 }
 
 render();
