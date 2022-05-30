@@ -29,6 +29,7 @@ class Chunk
      * @param {*} x
      * @param {*} y 
      * @param {*} z 
+     * @returns Vector3, Chunk position or -1 if the component is out of bounds
      */
     worldToChunkPosition(x, y ,z)
     {
